@@ -2,8 +2,10 @@
 from PyQt6 import QtCore
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets  # QtWidgets for QApplication
+from PyQt6.QtGui import QPen
+
 from menuBar import MenuBar
-from toolBar import Toolbar
+from toolBar import ToolBar
 from drawingCanvas import DrawingCanvas
 import sys
 
@@ -15,17 +17,30 @@ class Window(QtWidgets.QMainWindow):
     # Constructor :-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #basic frame of the UI including menu bar
-        self.__initUI()
+        # basic frame of the UI including menu bar
         self.__initVars()
-
-    def __initUI(self):        
         # setting title
         self.setWindowTitle("Paint with PyQt6")
         # setting geometry to main window
         self.setGeometry(100, 100, 800, 600)
-            # creating menu bar
-        self.__menu = MenuBar(self.menuBar(),self)
+        self.__initWidgets()
+        self.__arrageWidgets()
+        # creating menu bar
+        self.__menu = MenuBar(self.menuBar(), self)
+
+    def __initWidgets(self):
+        cw = QtWidgets.QWidget()
+        self.setCentralWidget(cw)
+        self.__layout = QtWidgets.QHBoxLayout()
+        cw.setLayout(self.__layout)
+        self.__tb = ToolBar()
+        self.__dc = DrawingCanvas(self.__tb)
+        self.__v = QtWidgets.QGraphicsView()
+        self.__v.setScene(self.__dc)
+
+    def __arrageWidgets(self):
+        self.__layout.addWidget(self.__tb)
+        self.__layout.addWidget(self.__v)
 
     def __initVars(self):
         # creating image object
@@ -42,49 +57,11 @@ class Window(QtWidgets.QMainWindow):
         self.brushColor = QtCore.Qt.GlobalColor.black
         # QPoint object to tract the point
         self.lastPoint = QtCore.QPoint()
+
 # |--------------------------End of Constructor--------------------------------|
 
-    # method for checking mouse cicks
-
-    def mousePressEvent(self, event):
-
-        # if left mouse button is pressed
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            # make drawing flag true
-            self.drawing = True
-            # make last point to the point of cursor
-            self.lastPoint = event.pos()
-
-    # method for tracking mouse activity
-    def mouseMoveEvent(self, event):
-
-        # checking if left button is pressed and drawing flag is true
-        if (event.buttons() and QtCore.Qt.MouseButton.LeftButton) and self.drawing:
-
-            # creating painter object
-            painter = QtGui.QPainter(self.image)
-
-            # set the pen of the painter
-            painter.setPen(QtGui.QPen(self.brushColor, self.brushSize,
-                                      QtCore.Qt.PenStyle.SolidLine, QtCore.Qt.PenCapStyle.RoundCap, QtCore.Qt.PenJoinStyle.RoundJoin))
-
-            # draw line from the last point of cursor to the current point
-            # this will draw only one step
-            painter.drawLine(self.lastPoint, event.pos())
-
-            # change the last point
-            self.lastPoint = event.pos()
-            # update
-            self.update()
-
-    # method for mouse left button release
-    def mouseReleaseEvent(self, event):
-
-        if event.button() == QtCore.Qt.MouseButton.LeftButton:
-            # make drawing flag false
-            self.drawing = False
-
     # paint event
+
     def paintEvent(self, event):
         # create a canvas
         canvasPainter = QtGui.QPainter(self)
@@ -109,16 +86,17 @@ class Window(QtWidgets.QMainWindow):
         self.update()
 
     # methods for changing pixel sizes
-        
+
     def changeSize(self):
-        size = int(self.sender().text().replace("px",""))
+        size = int(self.sender().text().replace("px", ""))
         self.brushSize = size
-        
+
     # methods for changing colors
     def changeColor(self):
-        col = QtGui.QColor(0,0,0)
+        col = QtGui.QColor(0, 0, 0)
         col.setNamedColor(self.sender().text().lower())
         self.brushColor = col
+
 
 # create pyqt5 app
 App = QtWidgets.QApplication(sys.argv)
