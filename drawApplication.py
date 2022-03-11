@@ -1,14 +1,16 @@
 # importing libraries
-from PyQt6 import QtCore, QtGui, QtWidgets  # QtWidgets for QApplication
+from PyQt6 import QtCore
+from PyQt6 import QtGui
+from PyQt6 import QtWidgets  # QtWidgets for QApplication
 import sys
 
-# window class
 
-
+# =============================================================================
+# Window- Main Window for the application
+# ===============================================================================
 class Window(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
-
+    # Constructor :-
+    def __init__():
         # setting title
         self.setWindowTitle("Paint with PyQt6")
 
@@ -113,6 +115,7 @@ class Window(QtWidgets.QMainWindow):
         red = QtGui.QAction("Red", self)
         b_color.addAction(red)
         red.triggered.connect(self.redColor)
+# |--------------------------End of Constructor--------------------------------|
 
     # method for checking mouse cicks
 
