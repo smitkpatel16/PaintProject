@@ -2,6 +2,9 @@
 from PyQt6 import QtCore
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets  # QtWidgets for QApplication
+from menuBar import MenuBar
+from toolBar import Toolbar
+from drawingCanvas import DrawingCanvas
 import sys
 
 
@@ -10,20 +13,26 @@ import sys
 # ===============================================================================
 class Window(QtWidgets.QMainWindow):
     # Constructor :-
-    def __init__():
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #basic frame of the UI including menu bar
+        self.__initUI()
+        self.__initVars()
+
+    def __initUI(self):        
         # setting title
         self.setWindowTitle("Paint with PyQt6")
-
         # setting geometry to main window
         self.setGeometry(100, 100, 800, 600)
+            # creating menu bar
+        self.__menu = MenuBar(self.menuBar(),self)
 
+    def __initVars(self):
         # creating image object
         self.image = QtGui.QImage(
             self.size(), QtGui.QImage.Format.Format_RGB32)
-
         # making image color to white
-        # self.image.fill(QtCore.Qt.GlobalColor.white)
-
+        self.image.fill(QtCore.Qt.GlobalColor.white)
         # variables
         # drawing flag
         self.drawing = False
@@ -31,90 +40,8 @@ class Window(QtWidgets.QMainWindow):
         self.brushSize = 2
         # default color
         self.brushColor = QtCore.Qt.GlobalColor.black
-
         # QPoint object to tract the point
         self.lastPoint = QtCore.QPoint()
-
-        # creating menu bar
-        mainMenu = self.menuBar()
-
-        # creating file menu for save and clear action
-        fileMenu = mainMenu.addMenu("File")
-
-        # adding brush size to main menu
-        b_size = mainMenu.addMenu("Brush Size")
-
-        # adding brush color to ain menu
-        b_color = mainMenu.addMenu("Brush Color")
-
-        # creating save action
-        saveAction = QtGui.QAction("Save", self)
-        # adding short cut for save action
-        saveAction.setShortcut("Ctrl + S")
-        # adding save to the file menu
-        fileMenu.addAction(saveAction)
-        # adding action to the save
-        saveAction.triggered.connect(self.save)
-
-        # creating clear action
-        clearAction = QtGui.QAction("Clear", self)
-        # adding short cut to the clear action
-        clearAction.setShortcut("Ctrl + C")
-        # adding clear to the file menu
-        fileMenu.addAction(clearAction)
-        # adding action to the clear
-        clearAction.triggered.connect(self.clear)
-
-        # creating options for brush sizes
-        # creating action for selecting pixel of 4px
-        pix_4 = QtGui.QAction("4px", self)
-        # adding this action to the brush size
-        b_size.addAction(pix_4)
-        # adding method to this
-        pix_4.triggered.connect(self.Pixel_4)
-
-        # similarly repeating above steps for different sizes
-        pix_7 = QtGui.QAction("7px", self)
-        b_size.addAction(pix_7)
-        pix_7.triggered.connect(self.Pixel_7)
-
-        pix_9 = QtGui.QAction("9px", self)
-        b_size.addAction(pix_9)
-        pix_9.triggered.connect(self.Pixel_9)
-
-        pix_12 = QtGui.QAction("12px", self)
-        b_size.addAction(pix_12)
-        pix_12.triggered.connect(self.Pixel_12)
-
-        # creating options for brush color
-        # creating action for black color
-        black = QtGui.QAction("Black", self)
-        # adding this action to the brush colors
-        b_color.addAction(black)
-        # adding methods to the black
-        black.triggered.connect(self.blackColor)
-
-        # creating action for white color
-        white = QtGui.QAction("Eraser", self)
-        b_color.addAction(white)
-        white.triggered.connect(self.whiteColor)
-
-        # similarly repeating above steps for different color
-        blue = QtGui.QAction("Blue", self)
-        b_color.addAction(blue)
-        blue.triggered.connect(self.blueColor)
-
-        green = QtGui.QAction("Green", self)
-        b_color.addAction(green)
-        green.triggered.connect(self.greenColor)
-
-        yellow = QtGui.QAction("Yellow", self)
-        b_color.addAction(yellow)
-        yellow.triggered.connect(self.yellowColor)
-
-        red = QtGui.QAction("Red", self)
-        b_color.addAction(red)
-        red.triggered.connect(self.redColor)
 # |--------------------------End of Constructor--------------------------------|
 
     # method for checking mouse cicks
@@ -182,37 +109,16 @@ class Window(QtWidgets.QMainWindow):
         self.update()
 
     # methods for changing pixel sizes
-    def Pixel_4(self):
-        self.brushSize = 4
-
-    def Pixel_7(self):
-        self.brushSize = 7
-
-    def Pixel_9(self):
-        self.brushSize = 9
-
-    def Pixel_12(self):
-        self.brushSize = 12
-
-    # methods for changing brush color
-    def blackColor(self):
-        self.brushColor = QtCore.Qt.GlobalColor.black
-
-    def blueColor(self):
-        self.brushColor = QtCore.Qt.GlobalColor.blue
-
-    def greenColor(self):
-        self.brushColor = QtCore.Qt.GlobalColor.green
-
-    def yellowColor(self):
-        self.brushColor = QtCore.Qt.GlobalColor.yellow
-
-    def redColor(self):
-        self.brushColor = QtCore.Qt.GlobalColor.red
-
-    def whiteColor(self):
-        self.brushColor = QtCore.Qt.GlobalColor.white
-
+        
+    def changeSize(self):
+        size = int(self.sender().text().replace("px",""))
+        self.brushSize = size
+        
+    # methods for changing colors
+    def changeColor(self):
+        col = QtGui.QColor(0,0,0)
+        col.setNamedColor(self.sender().text().lower())
+        self.brushColor = col
 
 # create pyqt5 app
 App = QtWidgets.QApplication(sys.argv)
