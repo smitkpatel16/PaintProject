@@ -22,13 +22,16 @@ class ToolBar(QtWidgets.QWidget):
         self.__line = QtWidgets.QPushButton("-")
         self.__ellipses = QtWidgets.QPushButton("O")
         self.__rectangles = QtWidgets.QPushButton("[]")
+        self.__freeHand = QtWidgets.QPushButton("@")
         sizes = ["1px", "2px", "3px", "4px",
                         "5px", "6px", "7px", "8px", "9px", "10px"]
         self.__sizesBtns = []
         for size in sizes:
             self.__sizesBtns.append(QtWidgets.QRadioButton(size))
         self.__selectedItemBtns = [self.__line,
-                                   self.__ellipses, self.__rectangles]
+                                   self.__ellipses,
+                                   self.__rectangles,
+                                   self.__freeHand]
         for btn in self.__selectedItemBtns:
             btn.setCheckable(True)
             btn.clicked.connect(self.__setSelectedItem)
@@ -55,6 +58,7 @@ class ToolBar(QtWidgets.QWidget):
         self.__layout.addWidget(self.__line, layoutPos, 0)
         self.__layout.addWidget(self.__ellipses, layoutPos, 1)
         self.__layout.addWidget(self.__rectangles, layoutPos+1, 0)
+        self.__layout.addWidget(self.__freeHand, layoutPos+1, 1)
         layoutPos += 2
         for i, btn in enumerate(self.__sizesBtns):
             if not i:
@@ -73,7 +77,10 @@ class ToolBar(QtWidgets.QWidget):
                 btn.setChecked(False)
 
     def __setSelectedItem(self):
-        self.selectedItem = self.sender().text()
+        if self.sender().text() == self.selectedItem:
+            self.selectedItem = None
+        else:
+            self.selectedItem = self.sender().text()
         for btn in self.__selectedItemBtns:
             if btn.text() != self.sender().text():
                 btn.setChecked(False)

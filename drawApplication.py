@@ -65,17 +65,15 @@ class Window(QtWidgets.QMainWindow):
     def __connectWidgets(self):
         # connect the signals to the slots
         self.__v.zoomEvent.connect(self.__zoomStatus)
+        self.__dc.movePosition.connect(self.__positionStatus)
 
     def __zoomStatus(self, zoom):
         self.__status.showMessage("Zoom : " + str(zoom))
     # paint event
 
-    def paintEvent(self, event):
-        # create a canvas
-        canvasPainter = QtGui.QPainter(self)
-
-        # draw rectangle on the canvas
-        canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
+    def __positionStatus(self, pos):
+        self.__status.showMessage(
+            "Position : " + str(pos.x()) + "," + str(pos.y()))
 
     # method for saving canvas
     def save(self):
@@ -84,7 +82,17 @@ class Window(QtWidgets.QMainWindow):
 
         if filePath == "":
             return
-        self.image.save(filePath)
+        area = self.__dc.itemsBoundingRect().toRect()
+        image = QtGui.QImage(
+            area.size(), QtGui.QImage.Format.Format_ARGB4444_Premultiplied)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        r = image.rect()
+        self.__dc.render(painter, QtCore.QRectF(
+            r.x(), r.y(), r.width(), r.height()), QtCore.QRectF(
+            area.x(), area.y(), area.width(), area.height()))
+        painter.end()
+        image.save(filePath)
 
     # method for clearing every thing on canvas
     def clear(self):
@@ -94,16 +102,6 @@ class Window(QtWidgets.QMainWindow):
         self.update()
 
     # methods for changing pixel sizes
-
-    def changeSize(self):
-        size = int(self.sender().text().replace("px", ""))
-        self.brushSize = size
-
-    # methods for changing colors
-    def changeColor(self):
-        col = QtGui.QColor(0, 0, 0)
-        col.setNamedColor(self.sender().text().lower())
-        self.brushColor = col
 
 
 # create pyqt5 app

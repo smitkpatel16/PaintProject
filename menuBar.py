@@ -3,21 +3,21 @@ from PyQt6 import QtGui
 
 
 #|============================================================================|#
-#| MenuBar
+# | MenuBar
 #|============================================================================|#
 class MenuBar(object):
-  def __init__(self, windowMenu, parentWindow):
-        
+    def __init__(self, windowMenu, parentWindow):
+
         # creating file menu for save and clear action
         fileMenu = windowMenu.addMenu("File")
 
         # adding brush size to main menu
         b_size = windowMenu.addMenu("Brush Size")
-        sizes=['2px','4px','7px','9px','12px']
+        sizes = ['2px', '4px', '7px', '9px', '12px']
 
         # adding brush color to ain menu
         b_color = windowMenu.addMenu("Brush Color")
-        colors = ['Black','Blue','Green','Yellow','White','Red']
+        colors = ['Black', 'Blue', 'Green', 'Yellow', 'White', 'Red']
 
         # creating save action
         saveAction = QtGui.QAction("Save", parentWindow)
@@ -36,17 +36,3 @@ class MenuBar(object):
         fileMenu.addAction(clearAction)
         # adding action to the clear
         clearAction.triggered.connect(parentWindow.clear)
-
-        # creating options for brush sizes
-        for size in sizes:
-          pix_size = QtGui.QAction(size,parentWindow)
-          b_size.addAction(pix_size)
-          pix_size.triggered.connect(parentWindow.changeSize)
-
-        # creating options for brush color
-        for color in colors:
-          brush_color = QtGui.QAction(color,parentWindow)
-          b_color.addAction(brush_color)
-          brush_color.triggered.connect(parentWindow.changeColor)
-
-  
