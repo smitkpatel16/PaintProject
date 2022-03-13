@@ -22,6 +22,11 @@ class ToolBar(QtWidgets.QWidget):
         self.__line = QtWidgets.QPushButton("-")
         self.__ellipses = QtWidgets.QPushButton("O")
         self.__rectangles = QtWidgets.QPushButton("[]")
+        sizes = ["1px", "2px", "3px", "4px",
+                        "5px", "6px", "7px", "8px", "9px", "10px"]
+        self.__sizesBtns = []
+        for size in sizes:
+            self.__sizesBtns.append(QtWidgets.QRadioButton(size))
         self.__selectedItemBtns = [self.__line,
                                    self.__ellipses, self.__rectangles]
         for btn in self.__selectedItemBtns:
@@ -46,11 +51,19 @@ class ToolBar(QtWidgets.QWidget):
             if not i:
                 btn.setChecked(True)
                 self.color = QColor(color)
-        self.__layout.addWidget(self.__line, len(self.__colors)//2, 0)
-        self.__layout.addWidget(self.__ellipses, len(self.__colors)//2, 1)
-        self.__layout.addWidget(self.__rectangles, len(self.__colors)//2+1, 0)
+        layoutPos = len(self.__colors)//2
+        self.__layout.addWidget(self.__line, layoutPos, 0)
+        self.__layout.addWidget(self.__ellipses, layoutPos, 1)
+        self.__layout.addWidget(self.__rectangles, layoutPos+1, 0)
+        layoutPos += 2
+        for i, btn in enumerate(self.__sizesBtns):
+            if not i:
+                btn.setChecked(True)
+            btn.clicked.connect(self.__setPenSize)
+            self.__layout.addWidget(btn, layoutPos+i//2, i % 2)
+        layoutPos += len(self.__sizesBtns)//2
 
-        self.__layout.setRowStretch(len(self.__colors)//2+2, 1)
+        self.__layout.setRowStretch(layoutPos+2, 1)
 
     def __setColor(self):
         self.color = QColor(self.sender().objectName())
@@ -62,5 +75,12 @@ class ToolBar(QtWidgets.QWidget):
     def __setSelectedItem(self):
         self.selectedItem = self.sender().text()
         for btn in self.__selectedItemBtns:
+            if btn.text() != self.sender().text():
+                btn.setChecked(False)
+
+    def __setPenSize(self):
+        self.penSize = int(self.sender().text()[:-2])
+        self.pen.setWidth(self.penSize)
+        for btn in self.__sizesBtns:
             if btn.text() != self.sender().text():
                 btn.setChecked(False)

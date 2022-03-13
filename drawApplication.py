@@ -6,7 +6,8 @@ from PyQt6.QtGui import QPen
 
 from menuBar import MenuBar
 from toolBar import ToolBar
-from drawingCanvas import DrawingCanvas
+from drawingBoard import DrawingCanvas
+from drawingBoard import DrawingView
 import sys
 
 
@@ -25,8 +26,10 @@ class Window(QtWidgets.QMainWindow):
         self.setGeometry(100, 100, 800, 600)
         self.__initWidgets()
         self.__arrageWidgets()
+        self.__connectWidgets()
         # creating menu bar
         self.__menu = MenuBar(self.menuBar(), self)
+        self.__status = self.statusBar()
 
     def __initWidgets(self):
         cw = QtWidgets.QWidget()
@@ -35,7 +38,7 @@ class Window(QtWidgets.QMainWindow):
         cw.setLayout(self.__layout)
         self.__tb = ToolBar()
         self.__dc = DrawingCanvas(self.__tb)
-        self.__v = QtWidgets.QGraphicsView()
+        self.__v = DrawingView()
         self.__v.setScene(self.__dc)
 
     def __arrageWidgets(self):
@@ -59,7 +62,12 @@ class Window(QtWidgets.QMainWindow):
         self.lastPoint = QtCore.QPoint()
 
 # |--------------------------End of Constructor--------------------------------|
+    def __connectWidgets(self):
+        # connect the signals to the slots
+        self.__v.zoomEvent.connect(self.__zoomStatus)
 
+    def __zoomStatus(self, zoom):
+        self.__status.showMessage("Zoom : " + str(zoom))
     # paint event
 
     def paintEvent(self, event):
