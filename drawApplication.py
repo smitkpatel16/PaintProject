@@ -16,8 +16,9 @@ import sys
 # ===============================================================================
 class Window(QtWidgets.QMainWindow):
     # Constructor :-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, dpi=150):
+        super().__init__()
+        self.__dpi = dpi
         # basic frame of the UI including menu bar
         self.__initVars()
         # setting title
@@ -28,7 +29,7 @@ class Window(QtWidgets.QMainWindow):
         self.__arrageWidgets()
         self.__connectWidgets()
         # creating menu bar
-        self.__menu = MenuBar(self.menuBar(), self)
+        MenuBar(self.menuBar(), self)
         self.__status = self.statusBar()
 
     def __initWidgets(self):
@@ -36,7 +37,7 @@ class Window(QtWidgets.QMainWindow):
         self.setCentralWidget(cw)
         self.__layout = QtWidgets.QHBoxLayout()
         cw.setLayout(self.__layout)
-        self.__tb = ToolBar()
+        self.__tb = ToolBar(dpi=self.__dpi)
         self.__dc = DrawingCanvas(self.__tb)
         self.__v = DrawingView()
         self.__v.setScene(self.__dc)
@@ -66,6 +67,11 @@ class Window(QtWidgets.QMainWindow):
         # connect the signals to the slots
         self.__v.zoomEvent.connect(self.__zoomStatus)
         self.__dc.movePosition.connect(self.__positionStatus)
+        self.__dc.measurement.connect(self.__measurement)
+        self.__tb.scrollMode.connect(self.__v.setScrollMode)
+
+    def __measurement(self, m):
+        self.__status.showMessage(m)
 
     def __zoomStatus(self, zoom):
         self.__status.showMessage("Zoom : " + str(zoom))
@@ -96,10 +102,8 @@ class Window(QtWidgets.QMainWindow):
 
     # method for clearing every thing on canvas
     def clear(self):
-        # make the whole canvas white
-        self.image.fill(QtCore.Qt.GlobalColor.white)
-        # update
-        self.update()
+        self.__dc.clear()
+        self.__v.update()
 
     # methods for changing pixel sizes
 
@@ -108,7 +112,8 @@ class Window(QtWidgets.QMainWindow):
 App = QtWidgets.QApplication(sys.argv)
 
 # create the instance of our Window
-window = Window()
+window = Window(dpi=(App.primaryScreen().physicalDotsPerInchY() +
+                App.primaryScreen().physicalDotsPerInchX())/2)
 
 # showing the window
 window.show()

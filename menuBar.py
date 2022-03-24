@@ -11,14 +11,6 @@ class MenuBar(object):
         # creating file menu for save and clear action
         fileMenu = windowMenu.addMenu("File")
 
-        # adding brush size to main menu
-        b_size = windowMenu.addMenu("Brush Size")
-        sizes = ['2px', '4px', '7px', '9px', '12px']
-
-        # adding brush color to ain menu
-        b_color = windowMenu.addMenu("Brush Color")
-        colors = ['Black', 'Blue', 'Green', 'Yellow', 'White', 'Red']
-
         # creating save action
         saveAction = QtGui.QAction("Save", parentWindow)
         # adding short cut for save action
