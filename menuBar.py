@@ -28,3 +28,12 @@ class MenuBar(object):
         fileMenu.addAction(clearAction)
         # adding action to the clear
         clearAction.triggered.connect(parentWindow.clear)
+
+        # creating import action
+        importAction = QtGui.QAction("Import", parentWindow)
+        # adding short cut to the import action
+        importAction.setShortcut("Ctrl + I")
+        # adding import to the file menu
+        fileMenu.addAction(importAction)
+        # adding action to the import
+        importAction.triggered.connect(parentWindow.importPDF)

@@ -20,9 +20,9 @@ class DrawingView(QGraphicsView):
         self.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing | QtGui.QPainter.RenderHint.TextAntialiasing
                            )
         self.setHorizontalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
     def wheelEvent(self, event):
 
@@ -41,11 +41,12 @@ class DrawingView(QGraphicsView):
         return super().wheelEvent(event)
 
     def setScrollMode(self, mode):
+
         if mode:
-            self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
             self.setTransformationAnchor(
                 QGraphicsView.ViewportAnchor.AnchorUnderMouse)
-
+            self.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+            self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
         else:
             self.setDragMode(QGraphicsView.DragMode.NoDrag)
             self.setTransformationAnchor(
@@ -80,7 +81,7 @@ class DrawingCanvas(QGraphicsScene):
             menuAction = QtGui.QAction(action, self)
             self.__menu.addAction(menuAction)
             menuAction.triggered.connect(self.__contextActionStep)
-        self.setSceneRect(0, 0, 250, 250)
+        self.setSceneRect(0, 0, 5000, 5000)
 
     def __contextActionStep(self, action):
         if self.sender().text() == "Delete":
@@ -118,8 +119,6 @@ class DrawingCanvas(QGraphicsScene):
         for i, tup in enumerate(self.__addedItems):
             tup[0].setZValue(i)
         self.__selectedItem = None
-        for tup in self.__addedItems:
-            tup[0].setPen(tup[1])
         self.update()
 
     def contextMenuEvent(self, event):
@@ -133,12 +132,8 @@ class DrawingCanvas(QGraphicsScene):
             # make drawing flag true
             self.drawing = True
         if not self.drawing:
-            for tup in self.__addedItems:
-                tup[0].setPen(tup[1])
             self.__selectedItem = self.itemAt(
                 event.scenePos(), QtGui.QTransform())
-            if self.__selectedItem:
-                self.__selectedItem.setPen(self.__selectionPen)
         return super().mousePressEvent(event)
 
     # method for tracking mouse activity

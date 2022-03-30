@@ -36,8 +36,10 @@ class ToolBar(QtWidgets.QWidget):
         self.__sizeGrp = QtWidgets.QGroupBox("Pen Size")
         self.__drawShapeGrp = QtWidgets.QGroupBox("Draw Shape")
         self.__measureSystemGrp = QtWidgets.QGroupBox("Measure System")
+        self.__empFactor = QtWidgets.QDoubleSpinBox()
+        self.__empFactor.setMinimum(1.0)
 
-        self.selectedItem = "line"
+        # self.selectedItem = "line"
         self.__measureSystem = MeasureSystem.Metric
 
     def __arrageWidgets(self):
@@ -47,6 +49,7 @@ class ToolBar(QtWidgets.QWidget):
         self.__sizeGrp.setLayout(QtWidgets.QGridLayout())
         self.__measureSystemGrp.setLayout(QtWidgets.QGridLayout())
         self.__drawShapeGrp.setLayout(QtWidgets.QGridLayout())
+
         for i, color in enumerate(self.__colors):
             w = QtWidgets.QPushButton(parent=self.__colorGrp)
             w.setObjectName(color)
@@ -85,6 +88,7 @@ class ToolBar(QtWidgets.QWidget):
                 w.setChecked(True)
             self.__measureSystemGrp.layout().addWidget(w, i//2, i % 2)
         layout.addWidget(self.__measureSystemGrp)
+        layout.addWidget(self.__empFactor)
 
         layout.addStretch(1)
 
@@ -141,13 +145,13 @@ class ToolBar(QtWidgets.QWidget):
 
     def pix2Met(self, pix):
         if self.__measureSystem == MeasureSystem.Metric:
-            v = 2.54*pix/self.__dpi
+            v = self.__empFactor.value()*2.54*pix/self.__dpi
             if v > 100:
                 text = "{}m {:.2f}cm".format(v//100, v - 100 * (v//100))
             else:
                 text = "{:.2f}cm".format(v)
         if self.__measureSystem == MeasureSystem.Imperial:
-            v = pix/self.__dpi
+            v = self.__empFactor.value()*pix/self.__dpi
             if v > 12:
                 text = "{}ft {:.2f}in".format(v//12, v - 12 * (v//12))
             else:

@@ -2,7 +2,8 @@
 from PyQt6 import QtCore
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets  # QtWidgets for QApplication
-from PyQt6.QtGui import QPen
+from PyQt6.QtGui import QPixmap, QImage
+import fitz
 
 from menuBar import MenuBar
 from toolBar import ToolBar
@@ -106,6 +107,20 @@ class Window(QtWidgets.QMainWindow):
         self.__v.update()
 
     # methods for changing pixel sizes
+    # import pdf and convert to image
+    def importPDF(self):
+        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Import PDF", "",
+                                                            "PDF(*.pdf);;All Files(*.*) ")
+        if filePath == "":
+            return
+
+        doc = fitz.open(filePath)
+        page = doc.loadPage(0)  # number of page
+        pix = page.get_pixmap(alpha=False)
+        pm = QPixmap.fromImage(QImage.fromData(pix.tobytes(output="png")))
+        pm = self.__dc.addPixmap(pm)
+        pm.setPos(0, 0)
+        self.__v.update()
 
 
 # create pyqt5 app
