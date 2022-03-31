@@ -23,11 +23,12 @@ class DrawingView(QGraphicsView):
             QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(
             QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.setScrollMode(True)
 
     def wheelEvent(self, event):
 
         setScale = False
-        if event.angleDelta().y() > 0 and self.__scaleFactor < 2:
+        if event.angleDelta().y() > 0 and self.__scaleFactor < 4:
             self.__scaleFactor += 0.1
             setScale = True
         elif self.__scaleFactor > 0.5 and event.angleDelta().y() < 0:

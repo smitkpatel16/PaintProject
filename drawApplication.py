@@ -5,10 +5,10 @@ from PyQt6 import QtWidgets  # QtWidgets for QApplication
 from PyQt6.QtGui import QPixmap, QImage
 import fitz
 
-from menuBar import MenuBar
-from toolBar import ToolBar
-from drawingBoard import DrawingCanvas
-from drawingBoard import DrawingView
+from MenuBar import MenuBar
+from ToolBar import ToolBar
+from DrawingBoard import DrawingCanvas
+from DrawingBoard import DrawingView
 import sys
 
 
