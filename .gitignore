@@ -4,4 +4,4 @@ mDictionaryCompleter.py
 MeasureScene.py
 Smit.png
 .vscode/settings.json
-__pycache__/.*.pyc
+__pycache__/*
