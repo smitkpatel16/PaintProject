@@ -5,6 +5,3 @@ MeasureScene.py
 Smit.png
 .vscode/settings.json
 __pycache__/.*.pyc
-__pycache__/drawingBoard.cpython-39.pyc
-__pycache__/menuBar.cpython-39.pyc
-__pycache__/toolBar.cpython-39.pyc
