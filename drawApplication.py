@@ -1,15 +1,17 @@
 # importing libraries
+import sys
+import fitz
+
 from PyQt6 import QtCore
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets  # QtWidgets for QApplication
 from PyQt6.QtGui import QPixmap, QImage
-import fitz
 
 from MenuBar import MenuBar
 from ToolBar import ToolBar
 from DrawingBoard import DrawingCanvas
 from DrawingBoard import DrawingView
-import sys
+from Interactions import Interactions
 
 
 # =============================================================================
@@ -22,6 +24,11 @@ class Window(QtWidgets.QMainWindow):
         self.__dpi = dpi
         # basic frame of the UI including menu bar
         self.__initVars()
+        # shortcut
+        self.__undoAction = QtGui.QShortcut(
+            QtGui.QKeySequence("Ctrl+Z"), self)
+        self.__redoAction = QtGui.QShortcut(
+            QtGui.QKeySequence("Ctrl+Y"), self)
         # setting title
         self.setWindowTitle("Paint with PyQt6")
         # setting geometry to main window
@@ -32,6 +39,7 @@ class Window(QtWidgets.QMainWindow):
         # creating menu bar
         MenuBar(self.menuBar(), self)
         self.__status = self.statusBar()
+# |--------------------------End of Constructor--------------------------------|
 
     def __initWidgets(self):
         cw = QtWidgets.QWidget()
@@ -42,6 +50,9 @@ class Window(QtWidgets.QMainWindow):
         self.__dc = DrawingCanvas(self.__tb)
         self.__v = DrawingView()
         self.__v.setScene(self.__dc)
+        # integrating interaction to take final actions
+        # to be used for undo/redo
+        self.__interaction = Interactions(canvas=self.__dc, view=self.__v)
 
     def __arrageWidgets(self):
         self.__layout.addWidget(self.__tb)
@@ -63,24 +74,17 @@ class Window(QtWidgets.QMainWindow):
         # QPoint object to tract the point
         self.lastPoint = QtCore.QPoint()
 
-# |--------------------------End of Constructor--------------------------------|
     def __connectWidgets(self):
         # connect the signals to the slots
         self.__v.zoomEvent.connect(self.__zoomStatus)
-        self.__dc.movePosition.connect(self.__positionStatus)
-        self.__dc.measurement.connect(self.__measurement)
+        self.__dc.itemAdded.connect(self.__interaction.itemAdded)
         self.__tb.scrollMode.connect(self.__v.setScrollMode)
-
-    def __measurement(self, m):
-        self.__status.showMessage(m)
+        self.__undoAction.activated.connect(self.__interaction.undo)
+        self.__redoAction.activated.connect(self.__interaction.redo)
 
     def __zoomStatus(self, zoom):
         self.__status.showMessage("Zoom : " + str(zoom))
     # paint event
-
-    def __positionStatus(self, pos):
-        self.__status.showMessage(
-            "Position : " + str(pos.x()) + "," + str(pos.y()))
 
     # method for saving canvas
     def save(self):
@@ -103,24 +107,20 @@ class Window(QtWidgets.QMainWindow):
 
     # method for clearing every thing on canvas
     def clear(self):
-        self.__dc.clear()
-        self.__v.update()
-
+        self.__interaction.clear()
     # methods for changing pixel sizes
     # import pdf and convert to image
+
     def importPDF(self):
         filePath, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Import PDF", "",
                                                             "PDF(*.pdf);;All Files(*.*) ")
         if filePath == "":
             return
-
         doc = fitz.open(filePath)
-        page = doc.loadPage(0)  # number of page
+        page = doc.load_page(0)  # number of page
         pix = page.get_pixmap(alpha=False)
         pm = QPixmap.fromImage(QImage.fromData(pix.tobytes(output="png")))
-        pm = self.__dc.addPixmap(pm)
-        pm.setPos(0, 0)
-        self.__v.update()
+        self.__interaction.importPDF(pm=pm)
 
 
 # create pyqt5 app

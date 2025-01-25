@@ -38,6 +38,7 @@ class ToolBar(QtWidgets.QWidget):
         self.__measureSystemGrp = QtWidgets.QGroupBox("Measure System")
         self.__empFactor = QtWidgets.QDoubleSpinBox()
         self.__empFactor.setMinimum(1.0)
+        self.__empFactor.setValue(29.0)
 
         # self.selectedItem = "line"
         self.__measureSystem = MeasureSystem.Metric

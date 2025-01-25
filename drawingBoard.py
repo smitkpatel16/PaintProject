@@ -58,8 +58,7 @@ class DrawingView(QGraphicsView):
 # DrawingCanvas-
 # ===============================================================================
 class DrawingCanvas(QGraphicsScene):
-    movePosition = QtCore.pyqtSignal(QtCore.QPointF)
-    measurement = QtCore.pyqtSignal(str)
+    itemAdded = QtCore.pyqtSignal(QGraphicsItem)
 
     def __init__(self, toolBar):
         super().__init__()
@@ -139,7 +138,6 @@ class DrawingCanvas(QGraphicsScene):
 
     # method for tracking mouse activity
     def mouseMoveEvent(self, event):
-        # self.movePosition.emit(event.scenePos())
         # checking if left button is pressed and drawing flag is true
         if (event.buttons() and QtCore.Qt.MouseButton.LeftButton) and self.drawing:
             if not self.__firstPoint:
@@ -210,6 +208,7 @@ class DrawingCanvas(QGraphicsScene):
                 self.__currentDraw.setZValue(len(self.__addedItems))
                 self.__addedItems.append(
                     (self.__currentDraw, QtGui.QPen(self.toolBar.pen)))
+                self.itemAdded.emit(self.__currentDraw)
             # make drawing flag false
             self.drawing = False
             self.__firstPoint = None
